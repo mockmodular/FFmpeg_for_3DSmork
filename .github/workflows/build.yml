@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     container:
-      image: devkitpro/devkita32:latest
+      image: devkitpro/devkitarm:latest
 
     steps:
       - name: Checkout
@@ -20,12 +20,25 @@ jobs:
           apt-get update
           apt-get install -y nasm build-essential pkg-config git wget
 
+      - name: Build and install libctru
+        run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=/opt/devkitpro/devkitARM
+          export PATH=$DEVKITARM/bin:$PATH
+          git clone https://github.com/devkitPro/libctru.git
+          cd libctru
+          make -j$(nproc)
+          make install
+
       - name: Build x264
         run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=/opt/devkitpro/devkitARM
+          export PATH=$DEVKITARM/bin:$PATH
           git clone https://code.videolan.org/videolan/x264.git
           cd x264
           ./configure \
-            --cross-prefix=/opt/devkitpro/devkitARM/bin/arm-none-eabi- \
+            --cross-prefix=arm-none-eabi- \
             --prefix=/opt/devkitpro/extra_lib \
             --host=arm-none-eabi \
             --extra-cflags="-mfloat-abi=hard -mtune=mpcore -mtp=cp15 -I/opt/devkitpro/extra_lib/include" \
@@ -37,10 +50,13 @@ jobs:
 
       - name: Build FFmpeg
         run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=/opt/devkitpro/devkitARM
+          export PATH=$DEVKITARM/bin:$PATH
           git reset --hard 2a054b87a7bacf3bc55690f621cf56ed9cf1ba5d
           ./configure \
             --enable-cross-compile \
-            --cross-prefix=/opt/devkitpro/devkitARM/bin/arm-none-eabi- \
+            --cross-prefix=arm-none-eabi- \
             --prefix=/opt/devkitpro/extra_lib \
             --cpu=armv6k --arch=arm --target-os=linux \
             --extra-cflags="-mfloat-abi=hard -mtune=mpcore -mtp=cp15 -Wno-error=incompatible-pointer-types -I/opt/devkitpro/extra_lib/include" \
