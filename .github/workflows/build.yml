@@ -8,22 +8,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    container:
+      image: devkitpro/devkitarm:latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install devkitPro
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gdebi-core wget
-          wget https://github.com/devkitPro/pacman/releases/latest/download/devkitpro-pacman.amd64.deb
-          sudo gdebi -n devkitpro-pacman.amd64.deb
-          sudo dkp-pacman -Sy --noconfirm 3ds-dev
-
       - name: Install build deps
         run: |
-          sudo apt-get install -y nasm build-essential pkg-config
+          apt-get update
+          apt-get install -y nasm build-essential pkg-config git wget
+
+      - name: Install 3ds-dev
+        run: |
+          dkp-pacman -Sy --noconfirm 3ds-dev
 
       - name: Build x264
         run: |
@@ -38,7 +37,7 @@ jobs:
             --enable-static --disable-shared --disable-opencl \
             --disable-cli --disable-asm
           make -j$(nproc)
-          sudo make install
+          make install
 
       - name: Build FFmpeg
         run: |
@@ -66,7 +65,7 @@ jobs:
             --enable-libx264 --enable-libdav1d \
             --enable-gpl --enable-pthreads
           make -j$(nproc)
-          sudo make install
+          make install
 
       - name: Package artifacts
         run: |
