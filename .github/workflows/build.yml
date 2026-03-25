@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     container:
-      image: devkitpro/devkitarm:latest
+      image: devkitpro/devkita32:latest
 
     steps:
       - name: Checkout
@@ -19,10 +19,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y nasm build-essential pkg-config git wget
-
-      - name: Install 3ds-dev
-        run: |
-          dkp-pacman -Sy --noconfirm 3ds-dev
 
       - name: Build x264
         run: |
