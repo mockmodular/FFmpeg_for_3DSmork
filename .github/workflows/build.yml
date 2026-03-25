@@ -15,10 +15,12 @@ jobs:
 
       - name: Install devkitPro
         run: |
-          wget https://apt.devkitpro.org/install-devkitpro-pacman
-          chmod +x ./install-devkitpro-pacman
-          sudo ./install-devkitpro-pacman
+          sudo apt-get update
+          sudo apt-get install -y gdebi-core
+          wget https://github.com/devkitPro/pacman/releases/latest/download/devkitpro-pacman.amd64.deb
+          sudo gdebi -n devkitpro-pacman.amd64.deb
           sudo dkp-pacman -Sy --noconfirm 3ds-dev
+
 
       - name: Install build deps
         run: |
